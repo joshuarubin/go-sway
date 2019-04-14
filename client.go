@@ -22,6 +22,17 @@ type client struct {
 type Client interface {
 	GetTree(context.Context) (*Node, error)
 	RunCommand(context.Context, string) ([]RunCommandReply, error)
+	GetWorkspaces(context.Context) ([]Workspace, error)
+	GetMarks(context.Context) ([]string, error)
+	GetOutputs(context.Context) ([]Output, error)
+	GetBarIDs(context.Context) ([]BarID, error)
+	GetBarConfig(context.Context, BarID) (*BarConfig, error)
+	GetVersion(context.Context) (*Version, error)
+	GetBindingModes(context.Context) ([]string, error)
+	GetConfig(context.Context) (*Config, error)
+	SendTick(context.Context, string) (*TickReply, error)
+	GetInputs(context.Context) ([]Input, error)
+	GetSeats(context.Context) ([]Seat, error)
 	Close() error
 }
 
@@ -139,4 +150,114 @@ func (c *client) RunCommand(ctx context.Context, command string) ([]RunCommandRe
 	}
 
 	return replies, err
+}
+
+func (c *client) GetWorkspaces(ctx context.Context) ([]Workspace, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetWorkspaces, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []Workspace
+	return ret, msg.Decode(&ret)
+}
+
+func (c *client) GetOutputs(ctx context.Context) ([]Output, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetOutputs, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []Output
+	return ret, msg.Decode(&ret)
+}
+
+func (c *client) GetMarks(ctx context.Context) ([]string, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetMarks, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []string
+	return ret, msg.Decode(&ret)
+}
+
+func (c *client) GetBarIDs(ctx context.Context) ([]BarID, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetBarConfig, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []BarID
+	return ret, msg.Decode(&ret)
+}
+
+func (c *client) GetBarConfig(ctx context.Context, id BarID) (*BarConfig, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetBarConfig, []byte(id))
+	if err != nil {
+		return nil, err
+	}
+
+	var ret BarConfig
+	return &ret, msg.Decode(&ret)
+}
+
+func (c *client) GetVersion(ctx context.Context) (*Version, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetVersion, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret Version
+	return &ret, msg.Decode(&ret)
+}
+
+func (c *client) GetBindingModes(ctx context.Context) ([]string, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetBindingModes, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []string
+	return ret, msg.Decode(&ret)
+}
+
+func (c *client) GetConfig(ctx context.Context) (*Config, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetConfig, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret Config
+	return &ret, msg.Decode(&ret)
+}
+
+func (c *client) SendTick(ctx context.Context, payload string) (*TickReply, error) {
+	msg, err := c.roundTrip(ctx, messageTypeSendTick, []byte(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	var ret TickReply
+	return &ret, msg.Decode(&ret)
+}
+
+func (c *client) GetInputs(ctx context.Context) ([]Input, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetInputs, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []Input
+	return ret, msg.Decode(&ret)
+}
+
+func (c *client) GetSeats(ctx context.Context) ([]Seat, error) {
+	msg, err := c.roundTrip(ctx, messageTypeGetSeats, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []Seat
+	return ret, msg.Decode(&ret)
 }

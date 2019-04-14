@@ -2,6 +2,8 @@ package sway_test
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"testing"
 	"time"
@@ -9,8 +11,13 @@ import (
 	sway "github.com/joshuarubin/go-sway"
 )
 
+func printJSON(v interface{}) {
+	out, _ := json.MarshalIndent(v, "", "  ")
+	fmt.Println(string(out))
+}
+
 func TestSocket(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
 
 	client, err := sway.New(ctx)
@@ -24,13 +31,90 @@ func TestSocket(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fh := focusHandler(client)
+	workspaces, err := client.GetWorkspaces(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	printJSON(workspaces)
+
+	outputs, err := client.GetOutputs(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(outputs)
+
+	marks, err := client.GetMarks(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(marks)
+
+	barIDs, err := client.GetBarIDs(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(barIDs)
+
+	for _, id := range barIDs {
+		config, err := client.GetBarConfig(ctx, id)
+		if err != nil {
+			t.Fatal(err)
+		}
+		printJSON(config)
+	}
+
+	version, err := client.GetVersion(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(*version)
+
+	bindingModes, err := client.GetBindingModes(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(bindingModes)
+
+	config, err := client.GetConfig(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(config)
+
+	tick, err := client.SendTick(ctx, "foo")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(tick)
+
+	inputs, err := client.GetInputs(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(inputs)
+
+	seats, err := client.GetSeats(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	printJSON(seats)
+
+	fh := focusHandler(client)
 	fh(ctx, n.FocusedNode())
 
 	h := sway.EventHandler{
 		Window: func(ctx context.Context, e sway.WindowEvent) {
-			if e.Change != sway.WindowChangeFocus {
+			if e.Change != "focus" {
 				return
 			}
 			fh(ctx, e.Container.FocusedNode())

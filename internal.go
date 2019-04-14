@@ -36,18 +36,19 @@ const (
 	messageTypeGetBindingModes
 	messageTypeGetConfig
 	messageTypeSendTick
-	messageTypeSync
+	messageTypeGetInputs = 100
+	messageTypeGetSeats  = 101
 )
 
 const (
-	eventReplyTypeWorkspace       messageType = 0x80000000
-	eventReplyTypeMode            messageType = 0x80000002
-	eventReplyTypeWindow          messageType = 0x80000003
-	eventReplyTypeBarConfigUpdate messageType = 0x80000004
-	eventReplyTypeBinding         messageType = 0x80000005
-	eventReplyTypeShutdown        messageType = 0x80000006
-	eventReplyTypeTick            messageType = 0x80000007
-	eventReplyTypeBarStatusUpdate messageType = 0x80000014
+	eventTypeWorkspace       messageType = 0x80000000
+	eventTypeMode            messageType = 0x80000002
+	eventTypeWindow          messageType = 0x80000003
+	eventTypeBarConfigUpdate messageType = 0x80000004
+	eventTypeBinding         messageType = 0x80000005
+	eventTypeShutdown        messageType = 0x80000006
+	eventTypeTick            messageType = 0x80000007
+	eventTypeBarStatusUpdate messageType = 0x80000014
 )
 
 var magic = [6]byte{'i', '3', '-', 'i', 'p', 'c'}
