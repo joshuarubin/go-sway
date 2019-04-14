@@ -39,44 +39,44 @@ func run() error {
 	}
 	defer client.Close()
 
-	fh := focusHandler(client)
-
 	n, err := client.GetTree(ctx)
 	if err != nil {
 		return err
 	}
 
-	fh(ctx, n.FocusedNode())
-
-	h := sway.EventHandler{
-		Window: func(ctx context.Context, e sway.WindowEvent) {
-			if e.Change != "focus" {
-				return
-			}
-			fh(ctx, e.Container.FocusedNode())
-		},
-	}
+	processFocus(ctx, client, n.FocusedNode())
 
 	lifecycle.GoErr(ctx, func() error {
-		return sway.Subscribe(ctx, h, sway.EventTypeWindow)
+		return sway.Subscribe(ctx, handler{client: client}, sway.EventTypeWindow)
 	})
 
 	return lifecycle.Wait(ctx)
 }
 
-func focusHandler(client sway.Client) func(context.Context, *sway.Node) {
-	return func(ctx context.Context, node *sway.Node) {
-		if node == nil {
-			return
-		}
+type handler struct {
+	sway.NoOpEventHandler
+	client sway.Client
+}
 
-		opt := "none"
-		if node.AppID == nil || *node.AppID != "kitty" {
-			opt = "altwin:ctrl_win"
-		}
+func (h handler) Window(ctx context.Context, e sway.WindowEvent) {
+	if e.Change != "focus" {
+		return
+	}
 
-		if _, err := client.RunCommand(ctx, `input '*' xkb_options `+opt); err != nil {
-			log.Println(err)
-		}
+	processFocus(ctx, h.client, e.Container.FocusedNode())
+}
+
+func processFocus(ctx context.Context, client sway.Client, node *sway.Node) {
+	if node == nil {
+		return
+	}
+
+	opt := "none"
+	if node.AppID == nil || *node.AppID != "kitty" {
+		opt = "altwin:ctrl_win"
+	}
+
+	if _, err := client.RunCommand(ctx, `input '*' xkb_options `+opt); err != nil {
+		log.Println(err)
 	}
 }

@@ -26,11 +26,6 @@ func TestSocket(t *testing.T) {
 	}
 	defer client.Close()
 
-	n, err := client.GetTree(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	workspaces, err := client.GetWorkspaces(ctx)
 	if err != nil {
 		t.Fatal(err)
@@ -109,37 +104,42 @@ func TestSocket(t *testing.T) {
 
 	printJSON(seats)
 
-	fh := focusHandler(client)
-	fh(ctx, n.FocusedNode())
-
-	h := sway.EventHandler{
-		Window: func(ctx context.Context, e sway.WindowEvent) {
-			if e.Change != "focus" {
-				return
-			}
-			fh(ctx, e.Container.FocusedNode())
-		},
+	n, err := client.GetTree(ctx)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	err = sway.Subscribe(ctx, h, sway.EventTypeWindow, sway.EventTypeShutdown)
-	if err != context.DeadlineExceeded && err != nil {
+	processFocus(ctx, client, n.FocusedNode())
+
+	if err = sway.Subscribe(ctx, testHandler{client: client}, sway.EventTypeWindow); err != context.DeadlineExceeded && err != nil {
 		t.Fatal(err)
 	}
 }
 
-func focusHandler(client sway.Client) func(context.Context, *sway.Node) {
-	return func(ctx context.Context, node *sway.Node) {
-		if node == nil {
-			return
-		}
+type testHandler struct {
+	sway.NoOpEventHandler
+	client sway.Client
+}
 
-		opt := "none"
-		if node.AppID == nil || *node.AppID != "kitty" {
-			opt = "altwin:ctrl_win"
-		}
+func (h testHandler) Window(ctx context.Context, e sway.WindowEvent) {
+	if e.Change != "focus" {
+		return
+	}
 
-		if _, err := client.RunCommand(ctx, `input '*' xkb_options `+opt); err != nil {
-			log.Println(err)
-		}
+	processFocus(ctx, h.client, e.Container.FocusedNode())
+}
+
+func processFocus(ctx context.Context, client sway.Client, node *sway.Node) {
+	if node == nil {
+		return
+	}
+
+	opt := "none"
+	if node.AppID == nil || *node.AppID != "kitty" {
+		opt = "altwin:ctrl_win"
+	}
+
+	if _, err := client.RunCommand(ctx, `input '*' xkb_options `+opt); err != nil {
+		log.Println(err)
 	}
 }

@@ -17,16 +17,27 @@ const (
 	EventTypeBarStatusUpdate EventType = "bar_status_update"
 )
 
-type EventHandler struct {
-	Workspace       func(context.Context, WorkspaceEvent)
-	Mode            func(context.Context, ModeEvent)
-	Window          func(context.Context, WindowEvent)
-	BarConfigUpdate func(context.Context, BarConfigUpdateEvent)
-	Binding         func(context.Context, BindingEvent)
-	Shutdown        func(context.Context, ShutdownEvent)
-	Tick            func(context.Context, TickEvent)
-	BarStatusUpdate func(context.Context, BarStatusUpdateEvent)
+type EventHandler interface {
+	Workspace(context.Context, WorkspaceEvent)
+	Mode(context.Context, ModeEvent)
+	Window(context.Context, WindowEvent)
+	BarConfigUpdate(context.Context, BarConfigUpdateEvent)
+	Binding(context.Context, BindingEvent)
+	Shutdown(context.Context, ShutdownEvent)
+	Tick(context.Context, TickEvent)
+	BarStatusUpdate(context.Context, BarStatusUpdateEvent)
 }
+
+type NoOpEventHandler struct{}
+
+func (h NoOpEventHandler) Workspace(context.Context, WorkspaceEvent)             {}
+func (h NoOpEventHandler) Mode(context.Context, ModeEvent)                       {}
+func (h NoOpEventHandler) Window(context.Context, WindowEvent)                   {}
+func (h NoOpEventHandler) BarConfigUpdate(context.Context, BarConfigUpdateEvent) {}
+func (h NoOpEventHandler) Binding(context.Context, BindingEvent)                 {}
+func (h NoOpEventHandler) Shutdown(context.Context, ShutdownEvent)               {}
+func (h NoOpEventHandler) Tick(context.Context, TickEvent)                       {}
+func (h NoOpEventHandler) BarStatusUpdate(context.Context, BarStatusUpdateEvent) {}
 
 func Subscribe(ctx context.Context, handler EventHandler, events ...EventType) error {
 	n, err := New(ctx)
@@ -42,87 +53,55 @@ func Subscribe(ctx context.Context, handler EventHandler, events ...EventType) e
 	}
 
 	for {
-		reply, err := c.recvMsg(ctx)
+		msg, err := c.recvMsg(ctx)
 		if err != nil {
 			return err
 		}
 
-		handler.process(ctx, reply)
+		processEvent(ctx, handler, msg)
 	}
 }
 
-func (h EventHandler) process(ctx context.Context, reply *message) {
-	switch reply.Type {
+func processEvent(ctx context.Context, h EventHandler, msg *message) {
+	switch msg.Type {
 	case eventTypeWorkspace:
-		if h.Workspace == nil {
-			return
-		}
-
 		var e WorkspaceEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.Workspace(ctx, e)
 		}
 	case eventTypeMode:
-		if h.Mode == nil {
-			return
-		}
-
 		var e ModeEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.Mode(ctx, e)
 		}
 	case eventTypeWindow:
-		if h.Window == nil {
-			return
-		}
-
 		var e WindowEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.Window(ctx, e)
 		}
 	case eventTypeBarConfigUpdate:
-		if h.BarConfigUpdate == nil {
-			return
-		}
-
 		var e BarConfigUpdateEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.BarConfigUpdate(ctx, e)
 		}
 	case eventTypeBinding:
-		if h.Binding == nil {
-			return
-		}
-
 		var e BindingEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.Binding(ctx, e)
 		}
 	case eventTypeShutdown:
-		if h.Shutdown == nil {
-			return
-		}
-
 		var e ShutdownEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.Shutdown(ctx, e)
 		}
 	case eventTypeTick:
-		if h.Tick == nil {
-			return
-		}
-
 		var e TickEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.Tick(ctx, e)
 		}
 	case eventTypeBarStatusUpdate:
-		if h.BarStatusUpdate == nil {
-			return
-		}
-
 		var e BarStatusUpdateEvent
-		if err := reply.Decode(&e); err == nil {
+		if err := msg.Decode(&e); err == nil {
 			h.BarStatusUpdate(ctx, e)
 		}
 	}
