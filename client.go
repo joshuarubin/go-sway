@@ -62,11 +62,30 @@ type Client interface {
 	GetSeats(context.Context) ([]Seat, error)
 }
 
+// Option can be passed to New to specify runtime configuration settings
+type Option func(*client)
+
+// WithSocketPath explicitly sets the sway socket path so it isn't read from
+// $SWAYSOCK
+func WithSocketPath(socketPath string) Option {
+	return func(c *client) {
+		c.path = socketPath
+	}
+}
+
 // New returns a Client configured to connect to $SWAYSOCK
-func New(ctx context.Context) (_ Client, err error) {
+func New(ctx context.Context, opts ...Option) (_ Client, err error) {
 	c := &client{}
 
-	if c.path = strings.TrimSpace(os.Getenv("SWAYSOCK")); c.path == "" {
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	if c.path == "" {
+		c.path = strings.TrimSpace(os.Getenv("SWAYSOCK"))
+	}
+
+	if c.path == "" {
 		return nil, fmt.Errorf("$SWAYSOCK is empty")
 	}
 
