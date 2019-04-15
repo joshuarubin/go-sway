@@ -24,7 +24,6 @@ func TestSocket(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer client.Close()
 
 	workspaces, err := client.GetWorkspaces(ctx)
 	if err != nil {
@@ -111,13 +110,18 @@ func TestSocket(t *testing.T) {
 
 	processFocus(ctx, client, n.FocusedNode())
 
-	if err = sway.Subscribe(ctx, testHandler{client: client}, sway.EventTypeWindow); err != context.DeadlineExceeded && err != nil {
+	th := testHandler{
+		EventHandler: sway.NoOpEventHandler(),
+		client:       client,
+	}
+
+	if err = sway.Subscribe(ctx, th, sway.EventTypeWindow); err != context.DeadlineExceeded && err != nil {
 		t.Fatal(err)
 	}
 }
 
 type testHandler struct {
-	sway.NoOpEventHandler
+	sway.EventHandler
 	client sway.Client
 }
 

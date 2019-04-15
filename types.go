@@ -41,6 +41,7 @@ type Node struct {
 	WindowProperties   *WindowProperties `json:"window_properties,omitempty"`
 }
 
+// FocusedNode traverses the node tree and returns the focused node
 func (n *Node) FocusedNode() *Node {
 	queue := []*Node{n}
 	for len(queue) > 0 {
@@ -61,20 +62,54 @@ func (n *Node) FocusedNode() *Node {
 	return nil
 }
 
-type Event interface{}
-
+// WorkspaceEvent is sent whenever a change involving a workspace occurs
 type WorkspaceEvent struct {
-	Change  string `json:"change,omitempty"`
-	Current *Node  `json:"current,omitempty"`
-	Old     *Node  `json:"old,omitempty"`
+	// The type of change that occurred
+	// The following change types are currently available:
+	// init:   the workspace was created
+	// empty:  the workspace is empty and is being destroyed since it is not
+	//         visible
+	// focus:  the workspace was focused. See the old property for the previous
+	//         focus
+	// move:   the workspace was moved to a different output
+	// rename: the workspace was renamed
+	// urgent: a view on the workspace has had their urgency hint set or all
+	//         urgency hints for views on the workspace have been cleared
+	// reload: The configuration file has been reloaded
+	Change string `json:"change,omitempty"`
+
+	// An object representing the workspace effected or null for reload changes
+	Current *Node `json:"current,omitempty"`
+
+	// For a focus change, this is will be an object representing the workspace
+	// being switched from. Otherwise, it is null
+	Old *Node `json:"old,omitempty"`
 }
 
+// WindowEvent is sent whenever a change involving a view occurs
 type WindowEvent struct {
-	Change    string `json:"change,omitempty"`
-	Container Node   `json:"container,omitempty"`
+	// The type of change that occurred
+	//
+	// The following change types are currently available:
+	// new:             The view was created
+	// close:           The view was closed
+	// focus:           The view was focused
+	// title:           The view's title has changed
+	// fullscreen_mode: The view's fullscreen mode has changed
+	// move:            The view has been reparented in the tree
+	// floating:        The view has become floating or is no longer floating
+	// urgent:          The view's urgency hint has changed status
+	// mark:            A mark has been added or removed from the view
+	Change string `json:"change,omitempty"`
+
+	// An object representing the view effected
+	Container Node `json:"container,omitempty"`
 }
 
+// ShutdownEvent is sent whenever the IPC is shutting down
 type ShutdownEvent struct {
+	// A string containing the reason for the shutdown.  Currently, the only
+	// value for change is exit, which is issued when sway is exiting.
 	Change string `json:"change,omitempty"`
 }
 
@@ -156,12 +191,12 @@ type BarConfigColors struct {
 	BindingModeBorder       string `json:"binding_mode_border,omitempty"`
 }
 
-type BarID string
-
+// BarConfigUpdateEvent is sent whenever a config for a bar changes. The event
+// is identical to that of GET_BAR_CONFIG when a bar ID is given as a payload.
 type BarConfigUpdateEvent = BarConfig
 
 type BarConfig struct {
-	ID                   BarID           `json:"id,omitempty"`
+	ID                   string          `json:"id,omitempty"`
 	Mode                 string          `json:"mode,omitempty"`
 	Position             string          `json:"position,omitempty"`
 	StatusCommand        string          `json:"status_command,omitempty"`
@@ -226,31 +261,60 @@ type Seat struct {
 	Devices      []Input `json:"devices,omitempty"`
 }
 
+// ModeEvent is sent whenever the binding mode changes
 type ModeEvent struct {
-	Change      string `json:"change,omitempty"`
-	PangoMarkup bool   `json:"pango_markup,omitempty"`
+	// The binding mode that became active
+	Change string `json:"change,omitempty"`
+
+	// Whether the mode should be parsed as pango markup
+	PangoMarkup bool `json:"pango_markup,omitempty"`
 }
 
 type Binding struct {
-	Change         string   `json:"change,omitempty"`
-	Command        string   `json:"command,omitempty"`
+	// The command associated with the binding
+	Command string `json:"command,omitempty"`
+
+	// An array of strings that correspond to each modifier key for the binding
 	EventStateMask []string `json:"event_state_mask,omitempty"`
-	InputCode      int64    `json:"input_code,omitempty"`
-	Symbol         *string  `json:"symbol,omitempty"`
-	InputType      string   `json:"input_type,omitempty"`
+
+	// For keyboard bindcodes, this is the key code for the binding. For mouse
+	// bindings, this is the X11 button number, if there is an equivalent. In
+	// all other cases, this will be 0.
+	InputCode int64 `json:"input_code,omitempty"`
+
+	// For keyboard bindsyms, this is the bindsym for the binding. Otherwise,
+	// this will be null
+	Symbol *string `json:"symbol,omitempty"`
+
+	// The input type that triggered the binding. This is either keyboard or
+	// mouse
+	InputType string `json:"input_type,omitempty"`
 }
 
+// BindingEvent is sent whenever a binding is executed
 type BindingEvent struct {
+	// Currently this will only be run
 	Change  string  `json:"change,omitempty"`
 	Binding Binding `json:"binding,omitempty"`
 }
 
+// TickEvent is sent when first subscribing to tick events or by a SEND_TICK
+// message
 type TickEvent struct {
-	First   bool   `json:"first,omitempty"`
+	// Whether this event was triggered by subscribing to the tick events
+	First bool `json:"first,omitempty"`
+
+	// The payload given with a SEND_TICK message, if any. Otherwise, an empty
+	// string
 	Payload string `json:"payload,omitempty"`
 }
 
+// BarStatusUpdateEvent is sent when the visibility of a bar changes due to a
+// modifier being pressed
 type BarStatusUpdateEvent struct {
-	ID                string `json:"id,omitempty"`
-	VisibleByModifier bool   `json:"visible_by_modifier,omitempty"`
+	// The bar ID effected
+	ID string `json:"id,omitempty"`
+
+	// Whether the bar should be made visible due to a modifier being pressed
+	VisibleByModifier bool `json:"visible_by_modifier,omitempty"`
 }

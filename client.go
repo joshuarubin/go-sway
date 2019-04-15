@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/joshuarubin/lifecycle"
 	"go.uber.org/multierr"
 )
 
@@ -19,23 +20,49 @@ type client struct {
 	path string
 }
 
+// A Client provides simple communication with the sway IPC
 type Client interface {
-	GetTree(context.Context) (*Node, error)
+	// Runs the payload as sway commands
 	RunCommand(context.Context, string) ([]RunCommandReply, error)
+
+	// Get the list of current workspaces
 	GetWorkspaces(context.Context) ([]Workspace, error)
-	GetMarks(context.Context) ([]string, error)
+
+	// Get the list of current outputs
 	GetOutputs(context.Context) ([]Output, error)
-	GetBarIDs(context.Context) ([]BarID, error)
-	GetBarConfig(context.Context, BarID) (*BarConfig, error)
+
+	// Get the node layout tree
+	GetTree(context.Context) (*Node, error)
+
+	// Get the names of all the marks currently set
+	GetMarks(context.Context) ([]string, error)
+
+	// Get the list of configured bar IDs
+	GetBarIDs(context.Context) ([]string, error)
+
+	// Get the specified bar config
+	GetBarConfig(context.Context, string) (*BarConfig, error)
+
+	// Get the version of sway that owns the IPC socket
 	GetVersion(context.Context) (*Version, error)
+
+	// Get the list of binding mode names
 	GetBindingModes(context.Context) ([]string, error)
+
+	// Returns the config that was last loaded
 	GetConfig(context.Context) (*Config, error)
+
+	// Sends a tick event with the specified payload
 	SendTick(context.Context, string) (*TickReply, error)
+
+	// Get the list of input devices
 	GetInputs(context.Context) ([]Input, error)
+
+	// Get the list of seats
 	GetSeats(context.Context) ([]Seat, error)
-	Close() error
 }
 
+// New returns a Client configured to connect to $SWAYSOCK
 func New(ctx context.Context) (_ Client, err error) {
 	c := &client{}
 
@@ -44,11 +71,17 @@ func New(ctx context.Context) (_ Client, err error) {
 	}
 
 	c.conn, err = (&net.Dialer{}).DialContext(ctx, "unix", c.path)
-	return c, err
-}
 
-func (c *client) Close() error {
-	return c.conn.Close()
+	if lifecycle.Exists(ctx) {
+		lifecycle.DeferErr(ctx, c.conn.Close)
+	} else {
+		go func() {
+			<-ctx.Done()
+			_ = c.conn.Close()
+		}()
+	}
+
+	return c, err
 }
 
 type payloadReader struct {
@@ -182,17 +215,17 @@ func (c *client) GetMarks(ctx context.Context) ([]string, error) {
 	return ret, msg.Decode(&ret)
 }
 
-func (c *client) GetBarIDs(ctx context.Context) ([]BarID, error) {
+func (c *client) GetBarIDs(ctx context.Context) ([]string, error) {
 	msg, err := c.roundTrip(ctx, messageTypeGetBarConfig, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var ret []BarID
+	var ret []string
 	return ret, msg.Decode(&ret)
 }
 
-func (c *client) GetBarConfig(ctx context.Context, id BarID) (*BarConfig, error) {
+func (c *client) GetBarConfig(ctx context.Context, id string) (*BarConfig, error) {
 	msg, err := c.roundTrip(ctx, messageTypeGetBarConfig, []byte(id))
 	if err != nil {
 		return nil, err

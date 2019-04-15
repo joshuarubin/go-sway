@@ -4,19 +4,41 @@ import (
 	"context"
 )
 
+// EventType is used to choose which events to Subscribe to
 type EventType string
 
 const (
-	EventTypeWorkspace       EventType = "workspace"
-	EventTypeMode            EventType = "mode"
-	EventTypeWindow          EventType = "window"
+	// EventTypeWorkspace is sent whenever an event involving a workspace occurs
+	// such as initialization of a new workspace or a different workspace gains
+	// focus
+	EventTypeWorkspace EventType = "workspace"
+
+	// EventTypeMode is sent whenever the binding mode changes
+	EventTypeMode EventType = "mode"
+
+	// EventTypeWindow is sent whenever an event involving a view occurs such as
+	// being reparented, focused, or closed
+	EventTypeWindow EventType = "window"
+
+	// EventTypeBarConfigUpdate is sent whenever a bar config changes
 	EventTypeBarConfigUpdate EventType = "barconfig_update"
-	EventTypeBinding         EventType = "binding"
-	EventTypeShutdown        EventType = "shutdown"
-	EventTypeTick            EventType = "tick"
+
+	// EventTypeBinding is sent when a configured binding is executed
+	EventTypeBinding EventType = "binding"
+
+	// EventTypeShutdown is sent when the ipc shuts down because sway is exiting
+	EventTypeShutdown EventType = "shutdown"
+
+	// EventTypeTick is sent when an ipc client sends a SEND_TICK message
+	EventTypeTick EventType = "tick"
+
+	//EventTypeBarStatusUpdate send when the visibility of a bar should change
+	//due to a modifier
 	EventTypeBarStatusUpdate EventType = "bar_status_update"
 )
 
+// An EventHandler is passed to Subscribe and its methods are called in response
+// to sway events
 type EventHandler interface {
 	Workspace(context.Context, WorkspaceEvent)
 	Mode(context.Context, ModeEvent)
@@ -28,23 +50,47 @@ type EventHandler interface {
 	BarStatusUpdate(context.Context, BarStatusUpdateEvent)
 }
 
-type NoOpEventHandler struct{}
+// NoOpEventHandler is used to help provide empty methods that aren't intended
+// to be handled by Subscribe
+//
+//	type handler struct {
+//		sway.EventHandler
+//	}
+//
+//	func (h handler) Window(ctx context.Context, e sway.WindowEvent) {
+//		...
+//	}
+//
+//	func main() {
+//		h := handler{
+//			EventHandler: sway.NoOpEventHandler(),
+//		}
+//
+//		ctx := context.Background()
+//
+//		sway.Subscribe(ctx, h, sway.EventTypeWindow)
+//	}
+func NoOpEventHandler() EventHandler {
+	return noOpEventHandler{}
+}
 
-func (h NoOpEventHandler) Workspace(context.Context, WorkspaceEvent)             {}
-func (h NoOpEventHandler) Mode(context.Context, ModeEvent)                       {}
-func (h NoOpEventHandler) Window(context.Context, WindowEvent)                   {}
-func (h NoOpEventHandler) BarConfigUpdate(context.Context, BarConfigUpdateEvent) {}
-func (h NoOpEventHandler) Binding(context.Context, BindingEvent)                 {}
-func (h NoOpEventHandler) Shutdown(context.Context, ShutdownEvent)               {}
-func (h NoOpEventHandler) Tick(context.Context, TickEvent)                       {}
-func (h NoOpEventHandler) BarStatusUpdate(context.Context, BarStatusUpdateEvent) {}
+type noOpEventHandler struct{}
 
+func (h noOpEventHandler) Workspace(context.Context, WorkspaceEvent)             {}
+func (h noOpEventHandler) Mode(context.Context, ModeEvent)                       {}
+func (h noOpEventHandler) Window(context.Context, WindowEvent)                   {}
+func (h noOpEventHandler) BarConfigUpdate(context.Context, BarConfigUpdateEvent) {}
+func (h noOpEventHandler) Binding(context.Context, BindingEvent)                 {}
+func (h noOpEventHandler) Shutdown(context.Context, ShutdownEvent)               {}
+func (h noOpEventHandler) Tick(context.Context, TickEvent)                       {}
+func (h noOpEventHandler) BarStatusUpdate(context.Context, BarStatusUpdateEvent) {}
+
+// Subscribe the IPC connection to the events listed in the payload
 func Subscribe(ctx context.Context, handler EventHandler, events ...EventType) error {
 	n, err := New(ctx)
 	if err != nil {
 		return err
 	}
-	defer n.Close()
 
 	c := n.(*client)
 
