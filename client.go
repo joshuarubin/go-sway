@@ -89,7 +89,9 @@ func New(ctx context.Context, opts ...Option) (_ Client, err error) {
 		return nil, fmt.Errorf("$SWAYSOCK is empty")
 	}
 
-	c.conn, err = (&net.Dialer{}).DialContext(ctx, "unix", c.path)
+	if c.conn, err = (&net.Dialer{}).DialContext(ctx, "unix", c.path); err != nil {
+		return nil, err
+	}
 
 	if lifecycle.Exists(ctx) {
 		lifecycle.DeferErr(ctx, c.conn.Close)
@@ -100,7 +102,7 @@ func New(ctx context.Context, opts ...Option) (_ Client, err error) {
 		}()
 	}
 
-	return c, err
+	return c, nil
 }
 
 type payloadReader struct {
