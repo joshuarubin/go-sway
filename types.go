@@ -119,6 +119,7 @@ type RunCommandReply struct {
 }
 
 type Workspace struct {
+	ID      int64  `json:"id,omitempty"`
 	Num     int64  `json:"num,omitempty"`
 	Name    string `json:"name,omitempty"`
 	Visible bool   `json:"visible,omitempty"`
