@@ -246,13 +246,15 @@ type LibInput struct {
 }
 
 type Input struct {
-	Identifier          string    `json:"identifier,omitempty"`
-	Name                string    `json:"name,omitempty"`
-	Vendor              int64     `json:"vendor,omitempty"`
-	Product             int64     `json:"product,omitempty"`
-	Type                string    `json:"type,omitempty"`
-	XKBActiveLayoutName *string   `json:"xkb_active_layout_name,omitempty"`
-	LibInput            *LibInput `json:"libinput,omitempty"`
+	Identifier           string    `json:"identifier,omitempty"`
+	Name                 string    `json:"name,omitempty"`
+	Vendor               int64     `json:"vendor,omitempty"`
+	Product              int64     `json:"product,omitempty"`
+	Type                 string    `json:"type,omitempty"`
+	XKBLayoutNames       []*string `json:"xkb_layout_names,omitempty"`
+	XKBActiveLayoutIndex int64     `json:"xkb_active_layout_index,omitempty"`
+	XKBActiveLayoutName  *string   `json:"xkb_active_layout_name,omitempty"`
+	LibInput             *LibInput `json:"libinput,omitempty"`
 }
 
 type Seat struct {
@@ -310,12 +312,31 @@ type TickEvent struct {
 	Payload string `json:"payload,omitempty"`
 }
 
-// BarStatusUpdateEvent is sent when the visibility of a bar changes due to a
+// BarStateUpdateEvent is sent when the visibility of a bar changes due to a
 // modifier being pressed
-type BarStatusUpdateEvent struct {
+type BarStateUpdateEvent struct {
 	// The bar ID effected
 	ID string `json:"id,omitempty"`
 
 	// Whether the bar should be made visible due to a modifier being pressed
 	VisibleByModifier bool `json:"visible_by_modifier,omitempty"`
+}
+
+// InputEvent is sent when something related to the input devices changes.
+type InputEvent struct {
+	// What has changed
+	//
+	// The following change types are currently available:
+	// added:           The input device became available
+	// removed:         The input device is no longer available
+	// xkb_keymap:      (Keyboards only) The keymap for the keyboard has changed
+	// xkb_layout:      (Keyboards only) The effective layout in the keymap
+	//                  has changed
+	// libinput_config: (libinput device only) A libinput config option for the
+	//                  device changed
+	Change string `json:"change,omitempty"`
+
+	// An object representing the input that is identical the ones
+	// GET_INPUTS gives
+	Input Input `json:"input,omitempty"`
 }
