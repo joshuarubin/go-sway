@@ -32,11 +32,15 @@ const (
 	// EventTypeTick is sent when an ipc client sends a SEND_TICK message
 	EventTypeTick EventType = "tick"
 
-	//EventTypeBarStateUpdate send when the visibility of a bar should change
-	//due to a modifier
+	// EventTypeBarStateUpdate is sent when the visibility of a bar should change
+	// due to a modifier
 	EventTypeBarStateUpdate EventType = "bar_state_update"
 
-	//EventTypeInput sent when something related to input devices changes
+	// Deprecated: EventTypeBarStatusUpdate is deprecated
+	// you should use EventTypeBarStateUpdate instead
+	EventTypeBarStatusUpdate EventType = EventTypeBarStateUpdate
+
+	// EventTypeInput is sent when something related to input devices changes
 	EventTypeInput EventType = "input"
 )
 
@@ -51,6 +55,7 @@ type EventHandler interface {
 	Shutdown(context.Context, ShutdownEvent)
 	Tick(context.Context, TickEvent)
 	BarStateUpdate(context.Context, BarStateUpdateEvent)
+	BarStatusUpdate(context.Context, BarStatusUpdateEvent)
 	Input(context.Context, InputEvent)
 }
 
@@ -88,6 +93,7 @@ func (h noOpEventHandler) Binding(context.Context, BindingEvent)                
 func (h noOpEventHandler) Shutdown(context.Context, ShutdownEvent)               {}
 func (h noOpEventHandler) Tick(context.Context, TickEvent)                       {}
 func (h noOpEventHandler) BarStateUpdate(context.Context, BarStateUpdateEvent) {}
+func (h noOpEventHandler) BarStatusUpdate(context.Context, BarStatusUpdateEvent) {}
 func (h noOpEventHandler) Input(context.Context, InputEvent) {}
 
 // Subscribe the IPC connection to the events listed in the payload

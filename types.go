@@ -610,6 +610,9 @@ type BarStateUpdateEvent struct {
 	VisibleByModifier bool `json:"visible_by_modifier,omitempty"`
 }
 
+// Deprecated: BarStatusUpdateEvent is deprecated, use BarStateUpdateEvent instead
+type BarStatusUpdateEvent = BarStateUpdateEvent
+
 // InputEvent is sent when something related to the input devices changes.
 type InputEvent struct {
 	// What has changed
