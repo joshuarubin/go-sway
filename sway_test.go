@@ -3,6 +3,7 @@ package sway_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"testing"
@@ -115,7 +116,7 @@ func TestSocket(t *testing.T) {
 		client:       client,
 	}
 
-	if err = sway.Subscribe(ctx, th, sway.EventTypeWindow); err != context.DeadlineExceeded && err != nil {
+	if err = sway.Subscribe(ctx, th, sway.EventTypeWindow); err != nil && !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatal(err)
 	}
 }
