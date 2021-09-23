@@ -32,9 +32,16 @@ const (
 	// EventTypeTick is sent when an ipc client sends a SEND_TICK message
 	EventTypeTick EventType = "tick"
 
-	//EventTypeBarStatusUpdate send when the visibility of a bar should change
-	//due to a modifier
-	EventTypeBarStatusUpdate EventType = "bar_status_update"
+	// EventTypeBarStateUpdate is sent when the visibility of a bar should change
+	// due to a modifier
+	EventTypeBarStateUpdate EventType = "bar_state_update"
+
+	// Deprecated: EventTypeBarStatusUpdate is deprecated
+	// you should use EventTypeBarStateUpdate instead
+	EventTypeBarStatusUpdate EventType = EventTypeBarStateUpdate
+
+	// EventTypeInput is sent when something related to input devices changes
+	EventTypeInput EventType = "input"
 )
 
 // An EventHandler is passed to Subscribe and its methods are called in response
@@ -47,7 +54,9 @@ type EventHandler interface {
 	Binding(context.Context, BindingEvent)
 	Shutdown(context.Context, ShutdownEvent)
 	Tick(context.Context, TickEvent)
+	BarStateUpdate(context.Context, BarStateUpdateEvent)
 	BarStatusUpdate(context.Context, BarStatusUpdateEvent)
+	Input(context.Context, InputEvent)
 }
 
 // NoOpEventHandler is used to help provide empty methods that aren't intended
@@ -83,7 +92,9 @@ func (h noOpEventHandler) BarConfigUpdate(context.Context, BarConfigUpdateEvent)
 func (h noOpEventHandler) Binding(context.Context, BindingEvent)                 {}
 func (h noOpEventHandler) Shutdown(context.Context, ShutdownEvent)               {}
 func (h noOpEventHandler) Tick(context.Context, TickEvent)                       {}
+func (h noOpEventHandler) BarStateUpdate(context.Context, BarStateUpdateEvent) {}
 func (h noOpEventHandler) BarStatusUpdate(context.Context, BarStatusUpdateEvent) {}
+func (h noOpEventHandler) Input(context.Context, InputEvent) {}
 
 // Subscribe the IPC connection to the events listed in the payload
 func Subscribe(ctx context.Context, handler EventHandler, events ...EventType) error {
@@ -145,10 +156,15 @@ func processEvent(ctx context.Context, h EventHandler, msg *message) {
 		if err := msg.Decode(&e); err == nil {
 			h.Tick(ctx, e)
 		}
-	case eventTypeBarStatusUpdate:
-		var e BarStatusUpdateEvent
+	case eventTypeBarStateUpdate:
+		var e BarStateUpdateEvent
 		if err := msg.Decode(&e); err == nil {
-			h.BarStatusUpdate(ctx, e)
+			h.BarStateUpdate(ctx, e)
+		}
+	case eventTypeInput:
+		var e InputEvent
+		if err := msg.Decode(&e); err == nil {
+			h.Input(ctx, e)
 		}
 	}
 }

@@ -48,7 +48,8 @@ const (
 	eventTypeBinding         messageType = 0x80000005
 	eventTypeShutdown        messageType = 0x80000006
 	eventTypeTick            messageType = 0x80000007
-	eventTypeBarStatusUpdate messageType = 0x80000014
+	eventTypeBarStateUpdate  messageType = 0x80000014
+	eventTypeInput           messageType = 0x80000015
 )
 
 var magic = [6]byte{'i', '3', '-', 'i', 'p', 'c'}
