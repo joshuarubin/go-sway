@@ -124,6 +124,14 @@ type Node struct {
 
 // FocusedNode traverses the node tree and returns the focused node
 func (n *Node) FocusedNode() *Node {
+	focusedNode := n.TraverseNodes(func(n *Node) bool {
+		return n.Focused
+	})
+	return focusedNode
+}
+
+// TraverseNodes returns the first Node matching the predicate
+func (n *Node) TraverseNodes(predicate func(*Node) bool) *Node {
 	queue := []*Node{n}
 	for len(queue) > 0 {
 		n = queue[0]
@@ -133,7 +141,7 @@ func (n *Node) FocusedNode() *Node {
 			continue
 		}
 
-		if n.Focused {
+		if predicate(n) {
 			return n
 		}
 

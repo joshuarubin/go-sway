@@ -148,3 +148,17 @@ func processFocus(ctx context.Context, client sway.Client, node *sway.Node) {
 		log.Println(err)
 	}
 }
+
+func TestFocused(t *testing.T) {
+	ctx := context.Background()
+	client, err := sway.New(ctx)
+	if err != nil {
+		t.Error(err)
+	}
+	tree, err := client.GetTree(ctx)
+	if err != nil {
+		t.Error(err)
+	}
+	f := tree.FocusedNode()
+	printJSON(f)
+}
