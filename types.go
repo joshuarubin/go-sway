@@ -18,6 +18,96 @@ type WindowProperties struct {
 	TransientFor *int64 `json:"transient_for,omitempty"`
 }
 
+type IdleInhibitors struct {
+	Application string `json:"application,omitempty"`
+	User        string `json:"user,omitempty"`
+}
+
+// Node types
+type NodeType string
+
+const (
+	NodeRoot        NodeType = "root"
+	NodeOutput      NodeType = "output"
+	NodeWorkspace   NodeType = "workspace"
+	NodeCon         NodeType = "con"
+	NodeFloatingCon NodeType = "floating_con"
+)
+
+// Node layouts
+type Layout string
+
+const (
+	LayoutOutput  Layout = "output"
+	LayoutSplitH  Layout = "splith"
+	LayoutSplitV  Layout = "splitv"
+	LayoutStacked Layout = "stacked"
+	LayoutTabbed  Layout = "tabbed"
+)
+
+// Border types
+type Border string
+
+const (
+	BorderNormal Border = "normal"
+	BorderNone   Border = "none"
+	BorderPixel  Border = "pixel"
+	BorderCsd    Border = "csd"
+)
+
+// Fullscreen modes
+type FullscreenMode int
+
+const (
+	FullscreenNone   FullscreenMode = 0
+	FullscreenOutput FullscreenMode = 1
+	FullscreenGlobal FullscreenMode = 2
+)
+
+// workspace event types
+type WorkspaceEventChange string
+
+const (
+	// The workspace is empty and is being destroyed since it is not visible
+	WorkspaceEmpty WorkspaceEventChange = "empty"
+	// The workspace was created
+	WorkspaceInit WorkspaceEventChange = "init"
+	// The workspace was focused. See the old property for the previous focus
+	WorkspaceFocus WorkspaceEventChange = "focus"
+	// The workspace was moved to a different output
+	WorkspaceMove WorkspaceEventChange = "move"
+	//  The configuration file has been reloaded
+	WorkspaceReload WorkspaceEventChange = "reload"
+	// The workspace was renamed
+	WorkspaceRename WorkspaceEventChange = "rename"
+	//  A view on the workspace has had their urgency hint set or all hints for views on the workspace have been cleared
+	WorkspaceUrgent WorkspaceEventChange = "urgent"
+)
+
+// window event types
+type WindowEventChange string
+
+const (
+	// The view was closed
+	WindowClose WindowEventChange = "close"
+	// The view has become floating or is no longer floating
+	WindowFloating WindowEventChange = "floating"
+	// The view was focused
+	WindowFocus WindowEventChange = "focus"
+	// The view's fullscreen mode has changed
+	WindowFullscreen WindowEventChange = "fullscreen_mode"
+	// A mark has been added or removed from the view
+	WindowMark WindowEventChange = "mark"
+	// The view has been reparented in the tree
+	WindowMove WindowEventChange = "move"
+	// The view was created
+	WindowNew WindowEventChange = "new"
+	// The view's title has changed
+	WindowTitle WindowEventChange = "title"
+	// The view's urgency hint has changed status
+	WindowUrgent WindowEventChange = "urgent"
+)
+
 type Node struct {
 	// The internal unique ID for this node
 	ID                 int64             `json:"id,omitempty"`
@@ -28,18 +118,18 @@ type Node struct {
 
 	// The node type.
 	// It can be "root", "output", "workspace", "con", or "floating_con"
-	Type               string            `json:"type,omitempty"`
+	Type NodeType `json:"type,omitempty"`
 
 	// The border style for the node.
 	// It can be "normal", "none", "pixel", or "csd"
-	Border             string            `json:"border,omitempty"`
+	Border Border `json:"border,omitempty"`
 
 	// Number of pixels used for the border width
 	CurrentBorderWidth int64             `json:"current_border_width,omitempty"`
 
 	// The node's layout.
 	// It can either be "splith", "splitv", "stacked", "tabbed", or "output"
-	Layout             string            `json:"layout,omitempty"`
+	Layout Layout `json:"layout,omitempty"`
 
 	// The node's orientation.
 	// It can be "vertical", "horizontal", or "none"
@@ -71,7 +161,7 @@ type Node struct {
 	Sticky             bool              `json:"sticky,omitempty"`
 
 	// List of marks assigned to the node
-	Marks              []interface{}     `json:"marks,omitempty"`
+	Marks []string `json:"marks,omitempty"`
 
 	// Whether the node is currently focused by the default seat (seat0)
 	Focused            bool              `json:"focused,omitempty"`
@@ -90,8 +180,8 @@ type Node struct {
 	Representation     *string           `json:"representation,omitempty"`
 
 	// (Only containers and views) The fullscreen mode of the node.
-	// 0 means none, 1 means full workspace, and 2 means global fullscreen
-	FullscreenMode     *int              `json:"fullscreen_mode,omitempty"`
+	// 0 means none, 1 means full output, and 2 means global fullscreen
+	FullscreenMode FullscreenMode `json:"fullscreen_mode,omitempty"`
 
 	// (Only views) For an xdg-shell view, the name of the application, if set.
 	// Otherwise, null
@@ -112,7 +202,7 @@ type Node struct {
 	// (Only views) An object containing the state of the application and user
 	// idle inhibitors. "application" can be "enabled" or "none".
 	// "user" can be "focus", "fullscreen", "open", "visible" or "none".
-	IdleInhibitors     interface{}       `json:"idle_inhibitors,omitempty"`
+	IdleInhibitors IdleInhibitors `json:"idle_inhibitors,omitempty"`
 
 	// (Only xwayland views) The X11 window ID for the xwayland view
 	Window             *int64            `json:"window,omitempty"`
@@ -165,7 +255,7 @@ type WorkspaceEvent struct {
 	// urgent: a view on the workspace has had their urgency hint set or all
 	//         urgency hints for views on the workspace have been cleared
 	// reload: The configuration file has been reloaded
-	Change string `json:"change,omitempty"`
+	Change WorkspaceEventChange `json:"change,omitempty"`
 
 	// An object representing the workspace effected or null for "reload" changes
 	Current *Node `json:"current,omitempty"`
@@ -189,7 +279,7 @@ type WindowEvent struct {
 	// floating:        The view has become floating or is no longer floating
 	// urgent:          The view's urgency hint has changed status
 	// mark:            A mark has been added or removed from the view
-	Change string `json:"change,omitempty"`
+	Change WindowEventChange `json:"change,omitempty"`
 
 	// An object representing the view effected
 	Container Node `json:"container,omitempty"`
