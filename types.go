@@ -310,6 +310,9 @@ type Workspace struct {
 	// Whether the workspace is currently focused by the default seat (seat0)
 	Focused bool   `json:"focused,omitempty"`
 
+	// Array of child node IDs in the current focus order
+	Focus []int64  `json:"focus,omitempty"`
+
 	// Whether a view on the workspace has the urgent flag set
 	Urgent  bool   `json:"urgent,omitempty"`
 
