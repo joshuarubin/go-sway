@@ -92,9 +92,9 @@ func (h noOpEventHandler) BarConfigUpdate(context.Context, BarConfigUpdateEvent)
 func (h noOpEventHandler) Binding(context.Context, BindingEvent)                 {}
 func (h noOpEventHandler) Shutdown(context.Context, ShutdownEvent)               {}
 func (h noOpEventHandler) Tick(context.Context, TickEvent)                       {}
-func (h noOpEventHandler) BarStateUpdate(context.Context, BarStateUpdateEvent) {}
+func (h noOpEventHandler) BarStateUpdate(context.Context, BarStateUpdateEvent)   {}
 func (h noOpEventHandler) BarStatusUpdate(context.Context, BarStatusUpdateEvent) {}
-func (h noOpEventHandler) Input(context.Context, InputEvent) {}
+func (h noOpEventHandler) Input(context.Context, InputEvent)                     {}
 
 // Subscribe the IPC connection to the events listed in the payload
 func Subscribe(ctx context.Context, handler EventHandler, events ...EventType) error {

@@ -110,11 +110,11 @@ const (
 
 type Node struct {
 	// The internal unique ID for this node
-	ID                 int64             `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 
 	// The name of the node such as the output name or window title.
 	// For the scratchpad, this will be "__i3_scratch" for compatibility with i3.
-	Name               string            `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// The node type.
 	// It can be "root", "output", "workspace", "con", or "floating_con"
@@ -125,7 +125,7 @@ type Node struct {
 	Border Border `json:"border,omitempty"`
 
 	// Number of pixels used for the border width
-	CurrentBorderWidth int64             `json:"current_border_width,omitempty"`
+	CurrentBorderWidth int64 `json:"current_border_width,omitempty"`
 
 	// The node's layout.
 	// It can either be "splith", "splitv", "stacked", "tabbed", or "output"
@@ -133,51 +133,51 @@ type Node struct {
 
 	// The node's orientation.
 	// It can be "vertical", "horizontal", or "none"
-	Orientation        string            `json:"orientation,omitempty"`
+	Orientation string `json:"orientation,omitempty"`
 
 	// The percentage of the node's parent that it takes up or null for the root
 	// and other special nodes such as the scratchpad
-	Percent            *float64          `json:"percent,omitempty"`
+	Percent *float64 `json:"percent,omitempty"`
 
 	// The absolute geometry of the node. The window decorations are excluded
 	// from this, but borders are included.
-	Rect               Rect              `json:"rect,omitempty"`
+	Rect Rect `json:"rect,omitempty"`
 
 	// The geometry of the contents inside the node. The window decorations are
 	// excluded from this calculation, but borders are included.
-	WindowRect         Rect              `json:"window_rect,omitempty"`
+	WindowRect Rect `json:"window_rect,omitempty"`
 
 	// The geometry of the decorations for the node relative to the parent node
-	DecoRect           Rect              `json:"deco_rect,omitempty"`
+	DecoRect Rect `json:"deco_rect,omitempty"`
 
 	// The natural geometry of the contents if it were to size itself
-	Geometry           Rect              `json:"geometry,omitempty"`
+	Geometry Rect `json:"geometry,omitempty"`
 
 	// Whether the node or any of its descendants has the urgent hint set.
 	// Note: This may not exist when compiled without xwayland support
-	Urgent             *bool             `json:"urgent,omitempty"`
+	Urgent *bool `json:"urgent,omitempty"`
 
 	// Whether the node is sticky (shows on all workspaces)
-	Sticky             bool              `json:"sticky,omitempty"`
+	Sticky bool `json:"sticky,omitempty"`
 
 	// List of marks assigned to the node
 	Marks []string `json:"marks,omitempty"`
 
 	// Whether the node is currently focused by the default seat (seat0)
-	Focused            bool              `json:"focused,omitempty"`
+	Focused bool `json:"focused,omitempty"`
 
 	// Array of child node IDs in the current focus order
-	Focus              []int64           `json:"focus,omitempty"`
+	Focus []int64 `json:"focus,omitempty"`
 
 	// The tiling children nodes for the node
-	Nodes              []*Node           `json:"nodes,omitempty"`
+	Nodes []*Node `json:"nodes,omitempty"`
 
 	// The floating children nodes for the node
-	FloatingNodes      []*Node           `json:"floating_nodes,omitempty"`
+	FloatingNodes []*Node `json:"floating_nodes,omitempty"`
 
 	// (Only workspaces) A string representation of the layout of the workspace
 	// that can be used as an aid in submitting reproduction steps for bug reports
-	Representation     *string           `json:"representation,omitempty"`
+	Representation *string `json:"representation,omitempty"`
 
 	// (Only containers and views) The fullscreen mode of the node.
 	// 0 means none, 1 means full output, and 2 means global fullscreen
@@ -185,19 +185,19 @@ type Node struct {
 
 	// (Only views) For an xdg-shell view, the name of the application, if set.
 	// Otherwise, null
-	AppID              *string           `json:"app_id,omitempty"`
+	AppID *string `json:"app_id,omitempty"`
 
 	// (Only views) The PID of the application that owns the view
-	PID                *uint32           `json:"pid,omitempty"`
+	PID *uint32 `json:"pid,omitempty"`
 
 	// (Only views) Whether the node is visible
-	Visible            *bool             `json:"visible,omitempty"`
+	Visible *bool `json:"visible,omitempty"`
 
 	// (Only views) The shell of the view, such as "xdg_shell" or "xwayland"
-	Shell              *string           `json:"shell,omitempty"`
+	Shell *string `json:"shell,omitempty"`
 
 	// (Only views) Whether the view is inhibiting the idle state
-	InhibitIdle        *bool             `json:"inhibit_idle,omitempty"`
+	InhibitIdle *bool `json:"inhibit_idle,omitempty"`
 
 	// (Only views) An object containing the state of the application and user
 	// idle inhibitors. "application" can be "enabled" or "none".
@@ -205,11 +205,11 @@ type Node struct {
 	IdleInhibitors IdleInhibitors `json:"idle_inhibitors,omitempty"`
 
 	// (Only xwayland views) The X11 window ID for the xwayland view
-	Window             *int64            `json:"window,omitempty"`
+	Window *int64 `json:"window,omitempty"`
 
 	// (Only xwayland views) An object containing the "title", "class", "instance",
 	// "window_role", "window_type", and "transient_for" for the view
-	WindowProperties   *WindowProperties `json:"window_properties,omitempty"`
+	WindowProperties *WindowProperties `json:"window_properties,omitempty"`
 }
 
 // FocusedNode traverses the node tree and returns the focused node
@@ -299,28 +299,28 @@ type RunCommandReply struct {
 
 type Workspace struct {
 	// The workspace number or -1 for workspaces that do not start with a number
-	Num     int64  `json:"num,omitempty"`
+	Num int64 `json:"num,omitempty"`
 
 	// The name of the workspace
-	Name    string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// Whether the workspace is currently visible on any output
-	Visible bool   `json:"visible,omitempty"`
+	Visible bool `json:"visible,omitempty"`
 
 	// Whether the workspace is currently focused by the default seat (seat0)
-	Focused bool   `json:"focused,omitempty"`
+	Focused bool `json:"focused,omitempty"`
 
 	// Array of child node IDs in the current focus order
-	Focus []int64  `json:"focus,omitempty"`
+	Focus []int64 `json:"focus,omitempty"`
 
 	// Whether a view on the workspace has the urgent flag set
-	Urgent  bool   `json:"urgent,omitempty"`
+	Urgent bool `json:"urgent,omitempty"`
 
 	// The bounds of the workspace. It consists of x, y, width, and height
-	Rect    Rect   `json:"rect,omitempty"`
+	Rect Rect `json:"rect,omitempty"`
 
 	// The name of the output that the workspace is on
-	Output  string `json:"output,omitempty"`
+	Output string `json:"output,omitempty"`
 }
 
 type Refresh float64
@@ -342,49 +342,49 @@ type OutputMode struct {
 
 type Output struct {
 	// The name of the output. On DRM, this is the connector
-	Name             string       `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// The make of the output
-	Make             string       `json:"make,omitempty"`
+	Make string `json:"make,omitempty"`
 
 	// The model of the output
-	Model            string       `json:"model,omitempty"`
+	Model string `json:"model,omitempty"`
 
 	// The output's serial number as a hexadecimal string
-	Serial           string       `json:"serial,omitempty"`
+	Serial string `json:"serial,omitempty"`
 
 	// Whether this output is active/enabled
-	Active           bool         `json:"active,omitempty"`
+	Active bool `json:"active,omitempty"`
 
 	// Whether this output is on/off (via DPMS)
-	DPMS             bool         `json:"dpms,omitempty"`
+	DPMS bool `json:"dpms,omitempty"`
 
 	// For i3 compatibility, this will be false. It does not make sense in Wayland
-	Primary          bool         `json:"primary,omitempty"`
+	Primary bool `json:"primary,omitempty"`
 
 	// The scale currently in use on the output or -1 for disabled outputs
-	Scale            float64      `json:"scale,omitempty"`
+	Scale float64 `json:"scale,omitempty"`
 
 	// The subpixel hinting current in use on the output.
 	// This can be "rgb", "bgr", "vrgb", "vbgr", or "none"
-	SubpixelHinting  string       `json:"subpixel_hinting,omitempty"`
+	SubpixelHinting string `json:"subpixel_hinting,omitempty"`
 
 	// The transform currently in use for the output. This can be "normal", "90",
 	// "180", "270", "flipped-90", "flipped-180", or "flipped-270"
-	Transform        string       `json:"transform,omitempty"`
+	Transform string `json:"transform,omitempty"`
 
 	// The workspace currently visible on the output or null for disabled outputs
-	CurrentWorkspace string       `json:"current_workspace,omitempty"`
+	CurrentWorkspace string `json:"current_workspace,omitempty"`
 
 	// An array of supported mode objects.
 	// Each object contains "width", "height", and "refresh"
-	Modes            []OutputMode `json:"modes,omitempty"`
+	Modes []OutputMode `json:"modes,omitempty"`
 
 	// An object representing the current mode containing "width", "height", and "refresh"
-	CurrentMode      OutputMode   `json:"current_mode,omitempty"`
+	CurrentMode OutputMode `json:"current_mode,omitempty"`
 
 	// The bounds for the output consisting of "x", "y", "width", and "height"
-	Rect             Rect         `json:"rect,omitempty"`
+	Rect Rect `json:"rect,omitempty"`
 }
 
 type BarConfigGaps struct {
@@ -398,51 +398,51 @@ type BarConfigGaps struct {
 // of the color
 type BarConfigColors struct {
 	// The color to use for the bar background on unfocused outputs
-	Background              string `json:"background,omitempty"`
+	Background string `json:"background,omitempty"`
 
 	// The color to use for the status line text on unfocused outputs
-	Statusline              string `json:"statusline,omitempty"`
+	Statusline string `json:"statusline,omitempty"`
 
 	// 	The color to use for the separator text on unfocused outputs
-	Separator               string `json:"separator,omitempty"`
+	Separator string `json:"separator,omitempty"`
 
 	// The color to use for the background of the bar on the focused output
-	FocusedBackground       string `json:"focused_background,omitempty"`
+	FocusedBackground string `json:"focused_background,omitempty"`
 
 	// The color to use for the status line text on the focused output
-	FocusedStatusline       string `json:"focused_statusline,omitempty"`
+	FocusedStatusline string `json:"focused_statusline,omitempty"`
 
 	// The color to use for the separator text on the focused output
-	FocusedSeparator        string `json:"focused_separator,omitempty"`
+	FocusedSeparator string `json:"focused_separator,omitempty"`
 
 	// The color to use for the text of the focused workspace button
-	FocusedWorkspaceText    string `json:"focused_workspace_text,omitempty"`
+	FocusedWorkspaceText string `json:"focused_workspace_text,omitempty"`
 
 	// The color to use for the background of the focused workspace button
-	FocusedWorkspaceBG      string `json:"focused_workspace_bg,omitempty"`
+	FocusedWorkspaceBG string `json:"focused_workspace_bg,omitempty"`
 
 	// The color to use for the border of the focused workspace button
-	FocusedWorkspaceBorder  string `json:"focused_workspace_border,omitempty"`
+	FocusedWorkspaceBorder string `json:"focused_workspace_border,omitempty"`
 
 	// The color to use for the text of the workspace buttons for the visible
 	// workspaces on unfocused outputs
-	ActiveWorkspaceText     string `json:"active_workspace_text,omitempty"`
+	ActiveWorkspaceText string `json:"active_workspace_text,omitempty"`
 
 	// The color to use for the background of the workspace buttons for the
 	// visible workspaces on unfocused outputs
-	ActiveWorkspaceBG       string `json:"active_workspace_bg,omitempty"`
+	ActiveWorkspaceBG string `json:"active_workspace_bg,omitempty"`
 
 	// The color to use for the border of the workspace buttons for the visible
 	// workspaces on unfocused outputs
-	ActiveWorkspaceBorder   string `json:"active_workspace_border,omitempty"`
+	ActiveWorkspaceBorder string `json:"active_workspace_border,omitempty"`
 
 	// The color to use for the text of the workspace buttons for workspaces
 	// that are not visible
-	InactiveWorkspaceText   string `json:"inactive_workspace_text,omitempty"`
+	InactiveWorkspaceText string `json:"inactive_workspace_text,omitempty"`
 
 	// The color to use for the background of the workspace buttons for workspaces
 	// that are not visible
-	InactiveWorkspaceBG     string `json:"inactive_workspace_bg,omitempty"`
+	InactiveWorkspaceBG string `json:"inactive_workspace_bg,omitempty"`
 
 	// The color to use for the border of the workspace buttons for workspaces
 	// that are not visible
@@ -450,24 +450,24 @@ type BarConfigColors struct {
 
 	// The color to use for the text of the workspace buttons for workspaces
 	// that contain an urgent view
-	UrgentWorkspaceText     string `json:"urgent_workspace_text,omitempty"`
+	UrgentWorkspaceText string `json:"urgent_workspace_text,omitempty"`
 
 	// The color to use for the background of the workspace buttons for workspaces
 	// that contain an urgent view
-	UrgentWorkspaceBG       string `json:"urgent_workspace_bg,omitempty"`
+	UrgentWorkspaceBG string `json:"urgent_workspace_bg,omitempty"`
 
 	// The color to use for the border of the workspace buttons for workspaces
 	// that contain an urgent view
-	UrgentWorkspaceBorder   string `json:"urgent_workspace_border,omitempty"`
+	UrgentWorkspaceBorder string `json:"urgent_workspace_border,omitempty"`
 
 	// The color to use for the text of the binding mode indicator
-	BindingModeText         string `json:"binding_mode_text,omitempty"`
+	BindingModeText string `json:"binding_mode_text,omitempty"`
 
 	// The color to use for the background of the binding mode indicator
-	BindingModeBG           string `json:"binding_mode_bg,omitempty"`
+	BindingModeBG string `json:"binding_mode_bg,omitempty"`
 
 	// The color to use for the border of the binding mode indicator
-	BindingModeBorder       string `json:"binding_mode_border,omitempty"`
+	BindingModeBorder string `json:"binding_mode_border,omitempty"`
 }
 
 // BarConfigUpdateEvent is sent whenever a config for a bar changes. The event
@@ -477,64 +477,64 @@ type BarConfigUpdateEvent = BarConfig
 // Represents the configuration for the bar with the bar ID sent as the payload
 type BarConfig struct {
 	// The bar ID
-	ID                   string          `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 
 	// The mode for the bar. It can be "dock", "hide", or "invisible"
-	Mode                 string          `json:"mode,omitempty"`
+	Mode string `json:"mode,omitempty"`
 
 	// The bar's position. It can currently either be "bottom" or "top"
-	Position             string          `json:"position,omitempty"`
+	Position string `json:"position,omitempty"`
 
 	// The command which should be run to generate the status line
-	StatusCommand        string          `json:"status_command,omitempty"`
+	StatusCommand string `json:"status_command,omitempty"`
 
 	// The font to use for the text on the bar
-	Font                 string          `json:"font,omitempty"`
+	Font string `json:"font,omitempty"`
 
 	// Whether to display the workspace buttons on the bar
-	WorkspaceButtons     bool            `json:"workspace_buttons,omitempty"`
+	WorkspaceButtons bool `json:"workspace_buttons,omitempty"`
 
 	// Minimum width in px for the workspace buttons on the bar
-	WorkspaceMinWidth    int64           `json:"workspace_min_width,omitempty"`
+	WorkspaceMinWidth int64 `json:"workspace_min_width,omitempty"`
 
 	// Whether to display the current binding mode on the bar
-	BindingModeIndicator bool            `json:"binding_mode_indicator,omitempty"`
+	BindingModeIndicator bool `json:"binding_mode_indicator,omitempty"`
 
 	// For i3 compatibility, this will be the boolean value "false".
-	Verbose              bool            `json:"verbose,omitempty"`
+	Verbose bool `json:"verbose,omitempty"`
 
 	// An object containing the #RRGGBBAA colors to use for the bar.
-	Colors               BarConfigColors `json:"colors,omitempty"`
+	Colors BarConfigColors `json:"colors,omitempty"`
 
 	// An object representing the gaps for the bar consisting of "top", "right",
 	// "bottom", and "left".
-	Gaps                 BarConfigGaps   `json:"gaps,omitempty"`
+	Gaps BarConfigGaps `json:"gaps,omitempty"`
 
 	// The absolute height to use for the bar or 0 to automatically size based on
 	// the font
-	BarHeight            int64           `json:"bar_height,omitempty"`
+	BarHeight int64 `json:"bar_height,omitempty"`
 
 	// The vertical padding to use for the status line
-	StatusPadding        int64           `json:"status_padding,omitempty"`
+	StatusPadding int64 `json:"status_padding,omitempty"`
 
 	// The horizontal padding to use for the status line when at the end of an output
-	StatusEdgePadding    int64           `json:"status_edge_padding,omitempty"`
+	StatusEdgePadding int64 `json:"status_edge_padding,omitempty"`
 }
 
 // Contains version information about the sway process
 type Version struct {
 	// The major version of the sway process
-	Major                int64  `json:"major,omitempty"`
+	Major int64 `json:"major,omitempty"`
 
 	// The minor version of the sway process
-	Minor                int64  `json:"minor,omitempty"`
+	Minor int64 `json:"minor,omitempty"`
 
 	// The patch version of the sway process
-	Patch                int64  `json:"patch,omitempty"`
+	Patch int64 `json:"patch,omitempty"`
 
 	// A human readable version string that will likely contain more useful
 	// information such as the git commit short hash and git branch
-	HumanReadable        string `json:"human_readable,omitempty"`
+	HumanReadable string `json:"human_readable,omitempty"`
 
 	// The path to the loaded config file
 	LoadedConfigFileName string `json:"loaded_config_file_name,omitempty"`
@@ -556,48 +556,48 @@ type TickReply struct {
 type LibInput struct {
 	// Whether events are being sent by the device.
 	// It can be "enabled", "disabled", or "disabled_on_external_mouse"
-	SendEvents        string     `json:"send_events,omitempty"`
+	SendEvents string `json:"send_events,omitempty"`
 
 	// Whether tap to click is enabled. It can be "enabled" or "disabled"
-	Tap               string     `json:"tap,omitempty"`
+	Tap string `json:"tap,omitempty"`
 
 	// The finger to button mapping in use. It can be "lmr" or "lrm"
-	TapButtonMap      string     `json:"tap_button_map,omitempty"`
+	TapButtonMap string `json:"tap_button_map,omitempty"`
 
 	// Whether tap-and-drag is enabled. It can be "enabled" or "disabled"
-	TapDrag           string     `json:"tap_drag,omitempty"`
+	TapDrag string `json:"tap_drag,omitempty"`
 
 	// Whether drag-lock is enabled. It can be "enabled" or "disabled"
-	TapDragLock       string     `json:"tap_drag_lock,omitempty"`
+	TapDragLock string `json:"tap_drag_lock,omitempty"`
 
 	// The pointer-acceleration in use
-	AccelSpeed        float64    `json:"accel_speed,omitempty"`
+	AccelSpeed float64 `json:"accel_speed,omitempty"`
 
 	// The acceleration profile in use. It can be "none", "flat", or "adaptive"
-	AccelProfile      string     `json:"accel_profile,omitempty"`
+	AccelProfile string `json:"accel_profile,omitempty"`
 
 	// Whether natural scrolling is enabled. It can be "enabled" or "disabled"
-	NaturalScroll     string     `json:"natural_scroll,omitempty"`
+	NaturalScroll string `json:"natural_scroll,omitempty"`
 
 	// Whether left-handed mode is enabled. It can be "enabled" or "disabled"
-	LeftHanded        string     `json:"left_handed,omitempty"`
+	LeftHanded string `json:"left_handed,omitempty"`
 
 	// The click method in use. It can be "none", "button_areas", or "clickfinger"
-	ClickMethod       string     `json:"click_method,omitempty"`
+	ClickMethod string `json:"click_method,omitempty"`
 
 	// Whether middle emulation is enabled. It can be "enabled" or "disabled"
-	MiddleEmulation   string     `json:"middle_emulation,omitempty"`
+	MiddleEmulation string `json:"middle_emulation,omitempty"`
 
 	// The scroll method in use.
 	// It can be "none", "two_finger", "edge", or "on_button_down"
-	ScrollMethod      string     `json:"scroll_method,omitempty"`
+	ScrollMethod string `json:"scroll_method,omitempty"`
 
 	// The scroll button to use when "scroll_method" is "on_button_down".
 	// This will be given as an input event code
-	ScrollButton      int64      `json:"scroll_button,omitempty"`
+	ScrollButton int64 `json:"scroll_button,omitempty"`
 
 	// Whether disable-while-typing is enabled. It can be "enabled" or "disabled"
-	DWT               string     `json:"dwt,omitempty"`
+	DWT string `json:"dwt,omitempty"`
 
 	// An array of 6 floats representing the calibration matrix for absolute
 	// devices such as touchscreens
@@ -606,50 +606,50 @@ type LibInput struct {
 
 type Input struct {
 	// The identifier for the input device
-	Identifier           string    `json:"identifier,omitempty"`
+	Identifier string `json:"identifier,omitempty"`
 
 	// The human readable name for the device
-	Name                 string    `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// The vendor code for the input device
-	Vendor               int64     `json:"vendor,omitempty"`
+	Vendor int64 `json:"vendor,omitempty"`
 
 	// The product code for the input device
-	Product              int64     `json:"product,omitempty"`
+	Product int64 `json:"product,omitempty"`
 
 	// The device type. Currently this can be "keyboard", "pointer", "touch",
 	// "tablet_tool", "tablet_pad", or "switch"
-	Type                 string    `json:"type,omitempty"`
+	Type string `json:"type,omitempty"`
 
 	// (Only keyboards) The name of the active keyboard layout in use
-	XKBActiveLayoutName  *string   `json:"xkb_active_layout_name,omitempty"`
+	XKBActiveLayoutName *string `json:"xkb_active_layout_name,omitempty"`
 
 	// (Only keyboards) A list a layout names configured for the keyboard
-	XKBLayoutNames       []string `json:"xkb_layout_names,omitempty"`
+	XKBLayoutNames []string `json:"xkb_layout_names,omitempty"`
 
 	// (Only keyboards) The index of the active keyboard layout in use
-	XKBActiveLayoutIndex *int64    `json:"xkb_active_layout_index,omitempty"`
+	XKBActiveLayoutIndex *int64 `json:"xkb_active_layout_index,omitempty"`
 
 	// (Only libinput devices) An object describing the current device settings.
-	LibInput             *LibInput `json:"libinput,omitempty"`
+	LibInput *LibInput `json:"libinput,omitempty"`
 }
 
 type Seat struct {
 	// The unique name for the seat
-	Name         string  `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// The number of capabilities that the seat has
-	Capabilities int64   `json:"capabilities,omitempty"`
+	Capabilities int64 `json:"capabilities,omitempty"`
 
 	// The id of the node currently focused by the seat or 0 when the seat is
 	// not currently focused by a node (i.e. a surface layer or xwayland
 	// unmanaged has focus)
-	Focus        int64   `json:"focus,omitempty"`
+	Focus int64 `json:"focus,omitempty"`
 
 	// An array of input devices that are attached to the seat.
 	// Currently, this is an array of objects that are identical to those
 	// returned by GET_INPUTS
-	Devices      []Input `json:"devices,omitempty"`
+	Devices []Input `json:"devices,omitempty"`
 }
 
 // ModeEvent is sent whenever the binding mode changes
@@ -685,7 +685,7 @@ type Binding struct {
 // BindingEvent is sent whenever a binding is executed
 type BindingEvent struct {
 	// Currently this will only be "run"
-	Change  string  `json:"change,omitempty"`
+	Change string `json:"change,omitempty"`
 
 	Binding Binding `json:"binding,omitempty"`
 }
